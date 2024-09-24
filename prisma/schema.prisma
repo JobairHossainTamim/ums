@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model Students {
+  student_id     Int       @id @default(autoincrement())
+  student_name   String
+  age            Int
+  email          String    @unique
+  frontend_mark  Int?
+  backend_mark   Int?
+  status         String?
+  enrollment     Enrollment[]  // One-to-many relationship with Enrollment
+}
+
+model Course {
+  course_id     Int       @id @default(autoincrement())
+  course_name   String
+  credits       Int
+  enrollment    Enrollment[]  // One-to-many relationship with Enrollment
+}
+
+model Enrollment {
+  enrollment_id  Int      @id @default(autoincrement())
+  student_id     Int
+  course_id      Int
+
+  student        Students  @relation(fields: [student_id], references: [student_id])
+  course         Course   @relation(fields: [course_id], references: [course_id])
+
+  @@unique([student_id, course_id])  // Prevents duplicate enrollments for the same student and course
+}
